@@ -5,6 +5,7 @@ import ThemeButton from "./theme-button";
 import { useSidebar } from "@/store";
 import ProfileInfo from "./profile-info";
 import VerticalHeader from "./vertical-header";
+import ChatInboxDropdown from "@/lib/chat/chat-inbox-dropdown";
 import NotificationMessage from "./notification-message";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import ClassicHeader from "./layout/classic-header";
@@ -16,6 +17,7 @@ const NavTools = ({ isDesktop }: { isDesktop: boolean }) => {
       {isDesktop && <FullScreen />}
 
       <ThemeButton />
+      <ChatInboxDropdown />
       <NotificationMessage />
       <ProfileInfo />
     </div>
