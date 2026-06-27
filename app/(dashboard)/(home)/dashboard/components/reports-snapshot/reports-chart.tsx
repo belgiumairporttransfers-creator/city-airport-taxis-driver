@@ -9,6 +9,7 @@ import {
   getXAxisConfig,
   getYAxisConfig,
 } from "@/lib/appex-chart-options";
+import type { ApexAxisChartSeries } from "apexcharts";
 
 interface ReportsChartProps {
   series: ApexAxisChartSeries;

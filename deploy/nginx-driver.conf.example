@@ -8,7 +8,7 @@ upstream city_airport_taxis_driver {
 
 server {
     listen 80;
-    server_name driver.example.com;
+    server_name driver.city-airport-taxis.be;
 
     client_max_body_size 10m;
 

@@ -9,7 +9,7 @@ const SingleFileUploader = () => {
   return (
     <FileUpload
       value={file}
-      onChange={setFile}
+      onChange={(value) => setFile(Array.isArray(value) ? (value[0] ?? null) : value)}
       accept={{
         "image/*": [".png", ".jpg", ".jpeg", ".gif"],
       }}
