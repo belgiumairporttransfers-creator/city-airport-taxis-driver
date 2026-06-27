@@ -19,18 +19,19 @@ fi
 if [[ -n "${IMAGE:-}" ]]; then
   echo "==> Pulling image: ${IMAGE}"
   export PULL_POLICY=always
-  docker compose -f "${COMPOSE_FILE}" pull driver
+  docker compose --env-file .env.production -f "${COMPOSE_FILE}" pull driver
 else
   echo "==> Building image locally"
   export IMAGE="city-airport-taxis-driver:latest"
+  docker compose --env-file .env.production -f "${COMPOSE_FILE}" build driver
 fi
 
 echo "==> Starting services"
-docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+docker compose --env-file .env.production -f "${COMPOSE_FILE}" up -d --remove-orphans
 
 echo "==> Waiting for health check"
 sleep 5
 curl -fsS "http://127.0.0.1:${PORT:-3002}/auth/login" >/dev/null
 
 echo "==> Deploy complete"
-docker compose -f "${COMPOSE_FILE}" ps
+docker compose --env-file .env.production -f "${COMPOSE_FILE}" ps

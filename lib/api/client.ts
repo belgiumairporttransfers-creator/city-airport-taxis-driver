@@ -6,7 +6,13 @@ import axios, {
 } from "axios";
 import API_ROUTES from "@/lib/api/routes";
 
-const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const baseURL =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    (process.env.NODE_ENV === "development" ? "http://localhost:5000/api" : undefined);
+
+if (!baseURL) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not configured.");
+}
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
