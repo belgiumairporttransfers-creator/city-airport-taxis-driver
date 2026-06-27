@@ -12,6 +12,7 @@ const API_ROUTES = {
     AUTH_SESSIONS: "/auth/sessions",
     AUTH_LOGOUT_ALL: "/auth/logout-all",
     DRIVER_APPLICATION_ME: "/drivers/me",
+    COMMUNICATION: "/communication",
     UPLOAD: "/upload",
 };
 
