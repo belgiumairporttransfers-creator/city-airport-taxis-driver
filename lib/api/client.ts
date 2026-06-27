@@ -5,6 +5,9 @@ import axios, {
     type AxiosResponse,
 } from "axios";
 import API_ROUTES from "@/lib/api/routes";
+import { captureCsrfToken, getCsrfToken } from "@/lib/api/csrf";
+
+export { clearCsrfToken } from "@/lib/api/csrf";
 
 const baseURL =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
@@ -35,12 +38,6 @@ export type ApiError = {
     status?: number;
 };
 
-const getCookie = (name: string): string | undefined => {
-    if (typeof document === "undefined") return undefined;
-    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : undefined;
-};
-
 const axiosInstance: AxiosInstance = axios.create({
     baseURL,
     withCredentials: true,
@@ -62,7 +59,7 @@ axiosInstance.interceptors.request.use((config) => {
     const method = config.method?.toUpperCase();
 
     if (method && !SAFE_METHODS.has(method)) {
-        const csrfToken = getCookie("csrfToken");
+        const csrfToken = getCsrfToken();
         if (csrfToken) {
             config.headers.set("X-CSRF-Token", csrfToken);
         }
@@ -87,8 +84,15 @@ const shouldSkipRefresh = (url?: string) => {
 };
 
 axiosInstance.interceptors.response.use(
-    (response) => unwrapResponse(response) as unknown as typeof response,
+    (response) => {
+        captureCsrfToken(response.headers);
+        return unwrapResponse(response) as unknown as typeof response;
+    },
     async (error: AxiosError<{ error?: string; message?: string }>) => {
+        if (error.response?.headers) {
+            captureCsrfToken(error.response.headers);
+        }
+
         const originalRequest = error.config as (typeof error.config & RetriableConfig) | undefined;
 
         if (
