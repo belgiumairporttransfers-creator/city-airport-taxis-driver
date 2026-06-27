@@ -30,8 +30,7 @@ yarn-error.log*
 .env.local
 .env.production
 .env*.local
-
-# vercel
+deploy/github-actions.secrets
 .vercel
 # vscode
 
