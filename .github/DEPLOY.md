@@ -47,7 +47,9 @@ VPS_IP=YOUR_VPS_IP bash deploy/first-vps-deploy.sh
 
 ## GitHub secrets & variables
 
-Use the **same VPS SSH secrets** as the backend/admin, with a different deploy path:
+Copy the **same deploy secrets** from the backend repo into this repo’s **production** environment (same as backend).
+
+**Settings → Environments → production → Environment secrets**:
 
 | Setting | Value |
 |---------|--------|
@@ -57,10 +59,25 @@ Use the **same VPS SSH secrets** as the backend/admin, with a different deploy p
 | Secret `DEPLOY_SSH_KEY` | Private SSH key (same as backend) |
 | Secret `DEPLOY_PATH` | `/opt/city-airport-taxis-driver` |
 | Secret `DEPLOY_PORT_APP` | `3002` |
-| Secret `GHCR_TOKEN` | PAT with `read:packages` |
-| Variable `NEXT_PUBLIC_BACKEND_URL` | `https://api.city-airport-taxis.be/api` |
-| Variable `NEXT_PUBLIC_SITE_URL` | `https://driver.city-airport-taxis.be` |
-| Variable `NEXT_PUBLIC_SOCKET_PATH` | `/socket.io` (optional) |
+| Secret `GHCR_TOKEN` | PAT with `read:packages` (same as backend) |
+
+Optional **Variables** (defaults are already in the workflow):
+
+| Variable | Value |
+|----------|--------|
+| `NEXT_PUBLIC_BACKEND_URL` | `https://api.city-airport-taxis.be/api` |
+| `NEXT_PUBLIC_SITE_URL` | `https://driver.city-airport-taxis.be` |
+| `NEXT_PUBLIC_SOCKET_PATH` | `/socket.io` |
+
+**Fastest setup:** copy backend production environment secrets into the driver repo, then change only `DEPLOY_PATH` and `DEPLOY_PORT_APP`.
+
+```bash
+cd driver-dashboard
+cp deploy/github-actions.secrets.example deploy/github-actions.secrets
+# Fill DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY_FILE, GHCR_TOKEN only
+./deploy/set-github-actions-config.sh belgiumairporttransfers-creator/city-airport-taxis-driver
+gh variable set SSH_DEPLOY_ENABLED -R belgiumairporttransfers-creator/city-airport-taxis-driver -b "true"
+```
 
 ## Deploy
 
