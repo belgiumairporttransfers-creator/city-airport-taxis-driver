@@ -88,7 +88,9 @@ const DriverBookingDetailPageView = () => {
                   onClick={async () => {
                     try {
                       const result = await acceptBooking.mutateAsync();
-                      router.push(`/trips/${result.assignment.bookingId}`);
+                      if (result?.assignment?.bookingId) {
+                        router.push(`/trips/${result.assignment.bookingId}`);
+                      }
                     } catch {
                       // Toast is shown by the mutation hook.
                     }
