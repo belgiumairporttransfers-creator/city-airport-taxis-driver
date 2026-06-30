@@ -1,4 +1,4 @@
-import { Application, Calendar, DashBoard, Graph, Messages, User, ClipBoard, Files, Building2 } from "@/components/svg";
+import { Application, Calendar, DashBoard, Graph, Messages, User, ClipBoard, Files, Building2, DocsCheck, List, Map, Flag, Cart } from "@/components/svg";
 import type { ComponentType } from "react";
 
 export interface MenuItem {
@@ -21,11 +21,22 @@ export const menus: MenuItem[] = [
     ],
   },
   {
+    title: "Operations",
+    icon: List,
+    child: [
+      { title: "My Bookings", icon: DocsCheck, href: "/operations/bookings" },
+      { title: "Active Trips", icon: Map, href: "/trips" },
+      { title: "Wallet", icon: Cart, href: "/wallet" },
+      { title: "Completed Bookings", icon: Flag, href: "/operations/completed" },
+    ],
+  },
+  {
     title: "Application",
     icon: Application,
     child: [
       { title: "Chat", icon: Messages, href: "/chat" },
       { title: "Calendar", icon: Calendar, href: "/calendar" },
+      { title: "Assignments", icon: DocsCheck, href: "/assignments" },
     ],
   },
   {

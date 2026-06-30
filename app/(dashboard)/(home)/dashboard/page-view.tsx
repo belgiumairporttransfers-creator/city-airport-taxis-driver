@@ -9,14 +9,16 @@ import ReportsArea from "./components/reports-area";
 import DashboardDropdown from "@/components/dashboard-dropdown";
 import Transaction from "./components/transaction";
 import Orders from "./components/orders";
+import OperationsOverview from "./components/operations-overview";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const DashboardPageView = () => {
   return (
-    <div className="space-y-6">
+      <div className="space-y-6">
       <div className="text-2xl font-medium text-default-800">
         Analytics Dashboard
       </div>
+      <OperationsOverview />
       {/* reports area */}
       <div className="grid grid-cols-12  gap-6 ">
         <div className="col-span-12 lg:col-span-8">

@@ -20,6 +20,16 @@ export const formatDate = (date: string | number | Date): string => {
   return new Date(date).toLocaleDateString("en-US", options);
 };
 
+export const formatPrice = (amount: number, currencySymbol = "€") =>
+  `${currencySymbol}${amount.toFixed(2)}`;
+
+const DISTANCE_LABEL = "km";
+
+export const formatDistance = (value: number) => {
+  const safeValue = Number.isFinite(value) ? value : 0;
+  return `${safeValue.toFixed(safeValue % 1 === 0 ? 0 : 1)} ${DISTANCE_LABEL}`;
+};
+
 export const formatTime = (time: number | Date | string): string => {
   if (!time) return "";
 

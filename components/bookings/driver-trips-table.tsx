@@ -1,0 +1,135 @@
+"use client";
+
+import Link from "next/link";
+import { Eye, MoreHorizontal, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { TripSummary } from "@/lib/schemas/trip";
+import { formatDate, formatTime } from "@/lib/utils";
+import { tripStatusClasses, tripStatusLabels } from "@/lib/trips/trip-utils";
+
+const EUR_SYMBOL = "€";
+
+const truncateAddress = (value: string, maxLength = 22) =>
+  value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
+
+type DriverTripsTableProps = {
+  trips: TripSummary[];
+  loading?: boolean;
+};
+
+const DriverTripsTable = ({ trips, loading = false }: DriverTripsTableProps) => {
+  return (
+    <div className="overflow-hidden rounded-lg border border-border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Booking ID</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Pickup</TableHead>
+            <TableHead>Delivery</TableHead>
+            <TableHead>Pickup Time</TableHead>
+            <TableHead>Vehicle</TableHead>
+            <TableHead>Trip Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={8} className="py-8 text-center text-default-500">
+                Loading trips...
+              </TableCell>
+            </TableRow>
+          ) : trips.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={8} className="py-8 text-center text-default-500">
+                No active trips yet. Accept a booking from My Bookings to start a trip.
+              </TableCell>
+            </TableRow>
+          ) : (
+            trips.map((trip) => (
+              <TableRow key={trip.id}>
+                <TableCell className="font-semibold text-default-900">
+                  {trip.bookingNumber}
+                </TableCell>
+                <TableCell className="font-semibold text-default-900">
+                  {trip.customer.firstName}
+                </TableCell>
+                <TableCell className="max-w-[180px] truncate text-default-600" title={trip.route.pickupAddress}>
+                  {truncateAddress(trip.route.pickupAddress)}
+                </TableCell>
+                <TableCell className="max-w-[180px] truncate text-default-600" title={trip.route.dropoffAddress}>
+                  {truncateAddress(trip.route.dropoffAddress)}
+                </TableCell>
+                <TableCell className="whitespace-nowrap text-default-600">
+                  {formatDate(trip.route.pickupDate)} {formatTime(trip.route.pickupTime)}
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
+                    {trip.vehicle.categoryName}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      tripStatusClasses[trip.status] ?? "bg-default-100 text-default-600"
+                    }`}
+                  >
+                    {tripStatusLabels[trip.status] ?? trip.status}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="button" size="icon" variant="ghost" aria-label="Open actions">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={`/trips/${trip.id}`}
+                          className="flex items-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View Trip
+                        </Link>
+                      </DropdownMenuItem>
+                      {trip.status !== "completed" ? (
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href={`/trips/${trip.id}`}
+                            className="flex items-center gap-2"
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                            Mark Complete
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : null}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
+
+export default DriverTripsTable;
