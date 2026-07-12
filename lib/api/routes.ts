@@ -17,6 +17,7 @@ const API_ROUTES = {
     DRIVER_TRIPS: "/drivers/trips",
     DRIVER_WALLET: "/drivers/wallet",
     DRIVER_WALLET_TRANSACTIONS: "/drivers/wallet/transactions",
+    DRIVER_DASHBOARD: "/drivers/dashboard",
     COMMUNICATION: "/communication",
     UPLOAD: "/upload",
 };
