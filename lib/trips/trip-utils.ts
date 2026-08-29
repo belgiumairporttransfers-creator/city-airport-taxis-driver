@@ -48,20 +48,25 @@ export const tripActionLabels: Record<TripAction, string> = {
   complete: "Complete Trip",
 };
 
+/**
+ * Index of the *next* step to perform.
+ * Steps before this index are completed (checkmark).
+ * After Accept, Accepted is already done — highlight Arrived next.
+ */
 export const getTripStepIndex = (status: string) => {
   switch (status) {
     case "driver_accepted":
-      return 0;
-    case "driver_arrived":
       return 1;
-    case "passenger_onboard":
+    case "driver_arrived":
       return 2;
-    case "trip_started":
+    case "passenger_onboard":
       return 3;
+    case "trip_started":
+      return 4;
     case "completed":
       return 4;
     default:
-      return 0;
+      return 1;
   }
 };
 

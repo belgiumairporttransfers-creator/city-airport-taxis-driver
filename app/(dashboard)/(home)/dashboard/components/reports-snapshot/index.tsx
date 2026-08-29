@@ -36,6 +36,12 @@ const ReportsSnapshot = () => {
       color: "primary",
     },
     {
+      value: "today",
+      text: "Today Earned",
+      total: isLoading ? "…" : formatPrice(totals?.todayEarned ?? 0),
+      color: "info",
+    },
+    {
       value: "active",
       text: "Active Bookings",
       total: isLoading ? "…" : formatCount(totals?.activeBookings ?? 0),
@@ -47,12 +53,6 @@ const ReportsSnapshot = () => {
       total: isLoading ? "…" : formatCount(totals?.completedBookings ?? 0),
       color: "success",
     },
-    {
-      value: "month",
-      text: "This Month",
-      total: isLoading ? "…" : formatPrice(totals?.thisMonthEarned ?? 0),
-      color: "info",
-    },
   ];
 
   const tabsContentData = [
@@ -60,6 +60,13 @@ const ReportsSnapshot = () => {
       value: "earnings",
       series: series?.earnings ? [{ data: series.earnings }] : EMPTY_SERIES,
       color: primary,
+    },
+    {
+      value: "today",
+      series: series?.thisMonthEarned
+        ? [{ data: series.thisMonthEarned }]
+        : EMPTY_SERIES,
+      color: info,
     },
     {
       value: "active",
@@ -74,13 +81,6 @@ const ReportsSnapshot = () => {
         ? [{ data: series.completedBookings }]
         : EMPTY_SERIES,
       color: success,
-    },
-    {
-      value: "month",
-      series: series?.thisMonthEarned
-        ? [{ data: series.thisMonthEarned }]
-        : EMPTY_SERIES,
-      color: info,
     },
   ];
 

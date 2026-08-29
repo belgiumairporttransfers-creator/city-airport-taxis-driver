@@ -48,6 +48,10 @@ const DriverBookingDetailPageView = () => {
   const canAccept = data.canAccept && data.status === "confirmed" && !data.unavailableMessage;
   const isSubmitting = acceptBooking.isPending;
   const isOwnAcceptedBooking = data.status === "accepted";
+  const pendingAssignmentId =
+    data.status === "confirmed" && data.assignmentId && !data.canAccept && !data.unavailableMessage
+      ? data.assignmentId
+      : undefined;
 
   return (
     <>
@@ -100,13 +104,20 @@ const DriverBookingDetailPageView = () => {
                   Accept Booking
                 </Button>
               ) : null}
+              {pendingAssignmentId ? (
+                <Button asChild>
+                  <Link href={`/assignments/${pendingAssignmentId}`}>
+                    Accept Assignment
+                  </Link>
+                </Button>
+              ) : null}
               {isOwnAcceptedBooking ? (
                 <>
                   <Button asChild variant="outline">
                     <Link href={`/trips/${data.id}`}>Manage Trip</Link>
                   </Button>
                   <Button asChild>
-                    <Link href={`/trips/${data.id}`}>Mark Complete</Link>
+                    <Link href={`/trips/${data.id}`}>Open Trip</Link>
                   </Button>
                 </>
               ) : null}

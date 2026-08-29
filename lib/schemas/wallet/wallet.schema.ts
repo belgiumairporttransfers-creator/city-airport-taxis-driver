@@ -12,6 +12,10 @@ export const walletTransactionSchema = z.object({
   amount: z.number(),
   currency: z.string(),
   description: z.string(),
+  requestNote: z.string().optional(),
+  adminNotes: z.string().optional(),
+  processedAt: z.string().optional(),
+  processedBy: z.string().optional(),
   createdAt: z.string(),
 });
 
@@ -19,10 +23,14 @@ export const driverWalletSummarySchema = z.object({
   currency: z.string(),
   availableBalance: z.number(),
   totalEarned: z.number(),
+  totalPaidOut: z.number(),
   totalTrips: z.number(),
   commissionPercent: z.number(),
+  todayEarned: z.number(),
   thisMonthEarned: z.number(),
   lastMonthEarned: z.number(),
+  pendingPayouts: z.number(),
+  spendableBalance: z.number(),
   recentTransactions: z.array(walletTransactionSchema),
 });
 

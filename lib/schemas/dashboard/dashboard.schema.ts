@@ -4,7 +4,9 @@ export const driverDashboardOverviewSchema = z.object({
   totals: z.object({
     totalEarned: z.number(),
     availableBalance: z.number(),
+    todayEarned: z.number().optional().default(0),
     thisMonthEarned: z.number(),
+    totalPaidOut: z.number().optional().default(0),
     activeBookings: z.number(),
     completedBookings: z.number(),
     totalTrips: z.number(),

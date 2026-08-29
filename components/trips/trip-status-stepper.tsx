@@ -31,7 +31,7 @@ const TripStatusStepper = ({ activeStep, status }: TripStatusStepperProps) => {
       ? 0
       : isTripComplete
         ? 100
-        : (activeStep / (tripSteps.length - 1)) * 100;
+        : (Math.min(activeStep, tripSteps.length - 1) / (tripSteps.length - 1)) * 100;
 
   const getStepState = (index: number) => {
     if (isTripComplete || index < activeStep) {

@@ -2,14 +2,38 @@
 
 import React from "react";
 import Link from "next/link";
-import { Home, TrendingUp, Wallet, PiggyBank, Car } from "lucide-react";
+import {
+  Banknote,
+  CalendarDays,
+  Car,
+  Home,
+  PiggyBank,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import LayoutLoader from "@/components/layout-loader";
 import DriverWalletTransactionsTable from "@/components/wallet/driver-wallet-transactions-table";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDriverWallet, useDriverWalletTransactions } from "@/hooks/queries/use-wallet";
-import { formatPrice } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  useDriverWallet,
+  useDriverWalletPayouts,
+  useDriverWalletTransactions,
+  useRequestDriverPayout,
+} from "@/hooks/queries/use-wallet";
+import { formatDate, formatPrice, formatTime } from "@/lib/utils";
 
 const SummaryCard = ({
   title,
@@ -36,9 +60,19 @@ const SummaryCard = ({
   </Card>
 );
 
+const payoutStatusClasses: Record<string, string> = {
+  pending: "bg-warning/10 text-warning",
+  completed: "bg-success/10 text-success",
+  failed: "bg-destructive/10 text-destructive",
+};
+
 const DriverWalletPageView = () => {
   const [page, setPage] = React.useState(1);
+  const [payoutPage, setPayoutPage] = React.useState(1);
   const [limit] = React.useState(10);
+  const [payoutOpen, setPayoutOpen] = React.useState(false);
+  const [amount, setAmount] = React.useState("");
+  const [note, setNote] = React.useState("");
 
   const { data: summary, isLoading, isError } = useDriverWallet();
   const {
@@ -46,6 +80,12 @@ const DriverWalletPageView = () => {
     isLoading: transactionsLoading,
     isFetching,
   } = useDriverWalletTransactions({ page, limit });
+  const {
+    data: payouts,
+    isLoading: payoutsLoading,
+    isFetching: payoutsFetching,
+  } = useDriverWalletPayouts({ page: payoutPage, limit });
+  const { mutate: requestPayout, isPending: isRequesting } = useRequestDriverPayout();
 
   if (isLoading) {
     return <LayoutLoader />;
@@ -56,6 +96,30 @@ const DriverWalletPageView = () => {
   }
 
   const totalPages = transactions?.meta.totalPages ?? 1;
+  const payoutTotalPages = payouts?.meta.totalPages ?? 1;
+  const spendable = summary.spendableBalance ?? summary.availableBalance;
+
+  const handleRequestPayout = () => {
+    const parsed = Number(amount);
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return;
+    }
+
+    requestPayout(
+      {
+        amount: parsed,
+        ...(note.trim() ? { note: note.trim() } : {}),
+      },
+      {
+        onSuccess: () => {
+          setPayoutOpen(false);
+          setAmount("");
+          setNote("");
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -68,26 +132,51 @@ const DriverWalletPageView = () => {
       </Breadcrumbs>
 
       <div className="mt-6 space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-default-900">Driver Wallet</h1>
-          <p className="mt-1 text-sm text-default-500">
-            Track your trip earnings and wallet balance. A {summary.commissionPercent}% platform fee is
-            deducted from each trip before your earning is credited.
-          </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-default-900">Driver Wallet</h1>
+            <p className="mt-1 text-sm text-default-500">
+              Track earnings, request payouts, and review your wallet history. A{" "}
+              {summary.commissionPercent}% platform fee is deducted from card trips.
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={() => setPayoutOpen(true)}
+            disabled={spendable <= 0}
+          >
+            Request Payout
+          </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <SummaryCard
             title="Available Balance"
             value={formatPrice(summary.availableBalance)}
-            hint="Ready in your wallet"
+            hint={
+              summary.pendingPayouts > 0
+                ? `Spendable: ${formatPrice(spendable)} · Pending: ${formatPrice(summary.pendingPayouts)}`
+                : "Ready in your wallet"
+            }
             icon={Wallet}
+          />
+          <SummaryCard
+            title="Today Earned"
+            value={formatPrice(summary.todayEarned)}
+            hint="Credits from trips completed today"
+            icon={CalendarDays}
           />
           <SummaryCard
             title="Total Earned"
             value={formatPrice(summary.totalEarned)}
             hint="All-time trip earnings"
             icon={PiggyBank}
+          />
+          <SummaryCard
+            title="Total Paid Out"
+            value={formatPrice(summary.totalPaidOut)}
+            hint="Approved payouts to date"
+            icon={Banknote}
           />
           <SummaryCard
             title="This Month"
@@ -103,20 +192,13 @@ const DriverWalletPageView = () => {
           />
         </div>
 
-        <Card>
-          <CardHeader className="border-b border-border px-5 py-4">
-            <CardTitle className="text-lg font-semibold text-default-900">Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <DriverWalletTransactionsTable transactions={summary.recentTransactions} />
-          </CardContent>
-        </Card>
-
         <Card className="overflow-hidden">
           <CardHeader className="border-b border-border px-5 py-4">
-            <CardTitle className="text-lg font-semibold text-default-900">Transaction History</CardTitle>
+            <CardTitle className="text-lg font-semibold text-default-900">
+              Transaction History
+            </CardTitle>
             <p className="mt-0.5 text-xs text-default-500">
-              Full ledger of credits from completed trips.
+              Full ledger of trip earnings and payouts.
             </p>
           </CardHeader>
           <CardContent className="space-y-4 p-4">
@@ -155,10 +237,102 @@ const DriverWalletPageView = () => {
           </CardContent>
         </Card>
 
+        <Card className="overflow-hidden">
+          <CardHeader className="border-b border-border px-5 py-4">
+            <CardTitle className="text-lg font-semibold text-default-900">My Payouts</CardTitle>
+            <p className="mt-0.5 text-xs text-default-500">
+              Payout requests waiting for admin approval or already processed.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4 p-4">
+            <div className="overflow-hidden rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-default-50 text-left">
+                    <th className="px-4 py-3 font-medium text-default-600">Amount</th>
+                    <th className="px-4 py-3 font-medium text-default-600">Status</th>
+                    <th className="px-4 py-3 font-medium text-default-600">Requested</th>
+                    <th className="px-4 py-3 font-medium text-default-600">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payoutsLoading || payoutsFetching ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-default-500">
+                        Loading payouts...
+                      </td>
+                    </tr>
+                  ) : (payouts?.items.length ?? 0) === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-default-500">
+                        No payout requests yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    payouts?.items.map((payout) => (
+                      <tr key={payout.id} className="border-b border-border last:border-0">
+                        <td className="px-4 py-3 font-semibold text-default-900">
+                          {formatPrice(payout.amount)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
+                              payoutStatusClasses[payout.status] ??
+                              "bg-default-100 text-default-600"
+                            }`}
+                          >
+                            {payout.status}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 text-default-600">
+                          {formatDate(payout.createdAt)} {formatTime(payout.createdAt)}
+                        </td>
+                        <td className="px-4 py-3 text-default-600">
+                          {payout.requestNote || "—"}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {payoutTotalPages > 1 ? (
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm text-default-500">
+                  Page {payoutPage} of {payoutTotalPages} · {payouts?.meta.total ?? 0} total
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={payoutPage <= 1 || payoutsLoading}
+                    onClick={() => setPayoutPage((current) => Math.max(1, current - 1))}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={payoutPage >= payoutTotalPages || payoutsLoading}
+                    onClick={() => setPayoutPage((current) => current + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-medium text-default-900">Keep completing trips to grow your wallet</p>
+              <p className="font-medium text-default-900">
+                Keep completing trips to grow your wallet
+              </p>
               <p className="mt-1 text-sm text-default-500">
                 Earnings are added automatically when you mark a trip as completed.
               </p>
@@ -169,6 +343,62 @@ const DriverWalletPageView = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={payoutOpen} onOpenChange={setPayoutOpen}>
+        <DialogContent size="md" className="p-0">
+          <DialogHeader className="border-b border-border px-5 py-4">
+            <DialogTitle>Request payout</DialogTitle>
+            <DialogDescription>
+              Available to request: {formatPrice(spendable)}. Admin must approve before the
+              amount leaves your wallet.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 px-5 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="payout-amount">Amount (EUR)</Label>
+              <Input
+                id="payout-amount"
+                type="number"
+                min={0.01}
+                step={0.01}
+                max={spendable}
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
+                placeholder="0.00"
+                disabled={isRequesting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="payout-note">Note (optional)</Label>
+              <Textarea
+                id="payout-note"
+                rows={3}
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                placeholder="Bank reference or note for admin"
+                disabled={isRequesting}
+              />
+            </div>
+          </div>
+          <DialogFooter className="border-t border-border px-5 py-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPayoutOpen(false)}
+              disabled={isRequesting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleRequestPayout}
+              disabled={isRequesting || !amount || Number(amount) <= 0}
+            >
+              {isRequesting ? "Submitting…" : "Submit request"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
