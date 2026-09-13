@@ -18,10 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { TripSummary } from "@/lib/schemas/trip";
-import { formatDate, formatTime } from "@/lib/utils";
 import { tripStatusClasses, tripStatusLabels } from "@/lib/trips/trip-utils";
-
-const EUR_SYMBOL = "€";
 
 const truncateAddress = (value: string, maxLength = 22) =>
   value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
@@ -62,9 +59,16 @@ const DriverTripsTable = ({ trips, loading = false }: DriverTripsTableProps) => 
             </TableRow>
           ) : (
             trips.map((trip) => (
-              <TableRow key={trip.id}>
+              <TableRow key={`${trip.id}-${trip.tripLeg ?? "outbound"}`}>
                 <TableCell className="font-semibold text-default-900">
-                  {trip.bookingNumber}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span>{trip.bookingNumber}</span>
+                    {trip.tripLeg === "return" ? (
+                      <span className="inline-flex rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">
+                        Return
+                      </span>
+                    ) : null}
+                  </div>
                 </TableCell>
                 <TableCell className="font-semibold text-default-900">
                   {trip.customer.firstName}
@@ -76,7 +80,7 @@ const DriverTripsTable = ({ trips, loading = false }: DriverTripsTableProps) => 
                   {truncateAddress(trip.route.dropoffAddress)}
                 </TableCell>
                 <TableCell className="whitespace-nowrap text-default-600">
-                  {formatDate(trip.route.pickupDate)} {formatTime(trip.route.pickupTime)}
+                  {trip.route.pickupDate} {trip.route.pickupTime}
                 </TableCell>
                 <TableCell>
                   <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">

@@ -23,6 +23,9 @@ export const driverBookingSchema = z.object({
     terminal: z.string().optional(),
   }),
   pricing: z.object({
+    total: z.number().optional(),
+    commissionPercent: z.number().optional(),
+    platformFee: z.number().optional(),
     driverEarning: z.number(),
   }),
   driver: z.object({
@@ -75,6 +78,9 @@ export const driverOpenBookingSchema = z.object({
   }),
   notes: z.string().optional(),
   pricing: z.object({
+    total: z.number().optional(),
+    commissionPercent: z.number().optional(),
+    platformFee: z.number().optional(),
     driverEarning: z.number(),
   }),
   canAccept: z.boolean(),

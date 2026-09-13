@@ -78,7 +78,7 @@ const DriverBookingsTable = ({
               <TableHead>Customer</TableHead>
               <TableHead>Pickup</TableHead>
               <TableHead>Delivery</TableHead>
-              <TableHead>Your earning</TableHead>
+              <TableHead>Your payout</TableHead>
               <TableHead>Vehicle</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
@@ -114,7 +114,14 @@ const DriverBookingsTable = ({
                     {truncateAddress(booking.route.dropoffAddress)}
                   </TableCell>
                   <TableCell className="font-semibold text-default-900">
-                    {formatPrice(booking.pricing.driverEarning, EUR_SYMBOL)}
+                    <div>
+                      <p>{formatPrice(booking.pricing.driverEarning, EUR_SYMBOL)}</p>
+                      {booking.pricing.commissionPercent != null ? (
+                        <p className="text-xs font-normal text-default-500">
+                          after {booking.pricing.commissionPercent}% commission
+                        </p>
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">

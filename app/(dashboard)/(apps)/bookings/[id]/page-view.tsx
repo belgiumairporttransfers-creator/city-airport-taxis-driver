@@ -160,10 +160,15 @@ const DriverBookingDetailPageView = () => {
               </p>
             </div>
             <div>
-              <p className="text-xs text-default-500">Your earning</p>
+              <p className="text-xs text-default-500">Your payout</p>
               <p className="font-medium text-default-900">
                 {formatPrice(data.pricing.driverEarning, EUR_SYMBOL)}
               </p>
+              {data.pricing.commissionPercent != null ? (
+                <p className="text-xs text-default-500">
+                  after {data.pricing.commissionPercent}% commission
+                </p>
+              ) : null}
             </div>
             {data.flight.required && data.flight.flightNumber ? (
               <div>

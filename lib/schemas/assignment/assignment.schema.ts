@@ -54,6 +54,9 @@ export const assignmentDetailSchema = assignmentSchema.extend({
   }),
   notes: z.string().optional(),
   pricing: z.object({
+    total: z.number().optional(),
+    commissionPercent: z.number().optional(),
+    platformFee: z.number().optional(),
     driverEarning: z.number(),
   }),
 });
