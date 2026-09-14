@@ -1,12 +1,6 @@
 import type { DriverBookingTripPhase } from "@/lib/schemas/booking";
 
-export type DriverBookingListViewKey =
-  | "all"
-  | "accepted"
-  | "arrived"
-  | "onboard"
-  | "started"
-  | "completed";
+export type DriverBookingListViewKey = "all" | "completed";
 
 export type DriverBookingListView = {
   key: DriverBookingListViewKey;
@@ -25,42 +19,10 @@ export const DRIVER_BOOKING_LIST_VIEWS: Record<
 > = {
   all: {
     key: "all",
-    title: "My Bookings",
-    description: "Only bookings you have accepted appear here.",
+    title: "All Bookings",
+    description: "All bookings you have accepted, including completed trips.",
     href: "/operations/bookings",
-    scope: "accepted",
-    showCompleteAction: true,
-  },
-  accepted: {
-    key: "accepted",
-    title: "Accepted Bookings",
-    description: "Accepted trips waiting for you to arrive at pickup.",
-    href: "/operations/accepted",
-    tripPhase: "driver_accepted",
-    showCompleteAction: true,
-  },
-  arrived: {
-    key: "arrived",
-    title: "Arrived Bookings",
-    description: "Trips where you have arrived at the pickup location.",
-    href: "/operations/arrived",
-    tripPhase: "driver_arrived",
-    showCompleteAction: true,
-  },
-  onboard: {
-    key: "onboard",
-    title: "Passenger Onboard",
-    description: "Trips where the passenger is onboard.",
-    href: "/operations/onboard",
-    tripPhase: "passenger_onboard",
-    showCompleteAction: true,
-  },
-  started: {
-    key: "started",
-    title: "Started Trips",
-    description: "Trips currently in progress.",
-    href: "/operations/started",
-    tripPhase: "trip_started",
+    scope: "all",
     showCompleteAction: true,
   },
   completed: {

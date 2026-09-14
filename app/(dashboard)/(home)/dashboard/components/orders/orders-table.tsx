@@ -117,7 +117,7 @@ const OrdersTable = () => {
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    Loading recent orders...
+                    Loading completed bookings...
                   </TableCell>
                 </TableRow>
               ) : table.getRowModel().rows?.length ? (
@@ -145,7 +145,7 @@ const OrdersTable = () => {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No recent orders.
+                    No completed bookings yet.
                   </TableCell>
                 </TableRow>
               )}
@@ -157,7 +157,7 @@ const OrdersTable = () => {
       {(data?.recentOrders?.length ?? 0) > 0 ? (
         <div className="mt-5 flex justify-center">
           <Button asChild size="sm" variant="outline">
-            <Link href="/operations/bookings">View all bookings</Link>
+            <Link href="/operations/completed">View all completed</Link>
           </Button>
         </div>
       ) : null}

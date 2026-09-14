@@ -94,7 +94,10 @@ const TripDetailPageView = () => {
               </p>
               <p>{data.route.pickupAddress}</p>
               <p>Dropoff: {data.route.dropoffAddress}</p>
-              {data.flight.flightNumber ? (
+              {data.route.airportPickup || data.flight?.required ? (
+                <p>Airport pickup: Yes</p>
+              ) : null}
+              {data.flight?.flightNumber ? (
                 <p>
                   Flight {data.flight.flightNumber}
                   {data.flight.terminal ? ` · Terminal ${data.flight.terminal}` : ""}

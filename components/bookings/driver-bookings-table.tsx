@@ -23,6 +23,7 @@ import {
   getDriverBookingDisplayStatus,
   isDriverBookingInProgress,
 } from "@/lib/booking-status-display";
+import { getTripTypeLabel } from "@/lib/trip-type-label";
 import { formatDate, formatPrice, formatTime } from "@/lib/utils";
 
 const EUR_SYMBOL = "€";
@@ -63,6 +64,7 @@ const DriverBookingsTable = ({
           <TableHeader>
             <TableRow>
               <TableHead>Booking ID</TableHead>
+              <TableHead>Trip type</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Pickup</TableHead>
               <TableHead>Delivery</TableHead>
@@ -76,88 +78,106 @@ const DriverBookingsTable = ({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="py-8 text-center text-default-500">
+                <TableCell colSpan={10} className="py-8 text-center text-default-500">
                   Loading bookings...
                 </TableCell>
               </TableRow>
             ) : bookings.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="py-8 text-center text-default-500">
+                <TableCell colSpan={10} className="py-8 text-center text-default-500">
                   No bookings found.
                 </TableCell>
               </TableRow>
             ) : (
               bookings.map((booking) => {
                 const display = getDriverBookingDisplayStatus(booking);
+                const tripType = getTripTypeLabel(booking.category);
 
                 return (
-                <TableRow key={booking.id}>
-                  <TableCell className="font-semibold text-default-900">
-                    {booking.bookingNumber}
-                  </TableCell>
-                  <TableCell className="font-semibold text-default-900">
-                    {booking.customer.firstName}
-                  </TableCell>
-                  <TableCell className="max-w-[180px] truncate text-default-600" title={booking.route.pickupAddress}>
-                    {truncateAddress(booking.route.pickupAddress)}
-                  </TableCell>
-                  <TableCell className="max-w-[180px] truncate text-default-600" title={booking.route.dropoffAddress}>
-                    {truncateAddress(booking.route.dropoffAddress)}
-                  </TableCell>
-                  <TableCell className="font-semibold text-default-900">
-                    <div>
-                      <p>{formatPrice(booking.pricing.driverEarning, EUR_SYMBOL)}</p>
-                      {booking.pricing.commissionPercent != null ? (
-                        <p className="text-xs font-normal text-default-500">
-                          after {booking.pricing.commissionPercent}% commission
-                        </p>
-                      ) : null}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
-                      {booking.vehicle.categoryName}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${display.className}`}
+                  <TableRow key={booking.id}>
+                    <TableCell className="font-semibold text-default-900">
+                      <Link
+                        href={`/bookings/${booking.id}`}
+                        className="text-primary hover:underline"
+                      >
+                        {booking.bookingNumber}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
+                        {tripType}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-semibold text-default-900">
+                      {booking.customer.firstName}
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[180px] truncate text-default-600"
+                      title={booking.route.pickupAddress}
                     >
-                      {display.label}
-                    </span>
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap text-default-600">
-                    {formatDate(booking.createdAt)} {formatTime(booking.createdAt)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button type="button" size="icon" variant="ghost" aria-label="Open actions">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/bookings/${booking.id}`} className="flex items-center gap-2">
-                            <Eye className="h-4 w-4" />
-                            View
-                          </Link>
-                        </DropdownMenuItem>
-                        {showCompleteAction && isDriverBookingInProgress(booking) ? (
+                      {truncateAddress(booking.route.pickupAddress)}
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[180px] truncate text-default-600"
+                      title={booking.route.dropoffAddress}
+                    >
+                      {truncateAddress(booking.route.dropoffAddress)}
+                    </TableCell>
+                    <TableCell className="font-semibold text-default-900">
+                      {formatPrice(booking.pricing.driverEarning, EUR_SYMBOL)}
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
+                        {booking.vehicle.categoryName}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${display.className}`}
+                      >
+                        {display.label}
+                      </span>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-default-600">
+                      {formatDate(booking.createdAt)} {formatTime(booking.createdAt)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            aria-label="Open actions"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
                           <DropdownMenuItem asChild>
                             <Link
-                              href={`/trips/${booking.id}`}
+                              href={`/bookings/${booking.id}`}
                               className="flex items-center gap-2"
                             >
-                              <CheckCircle2 className="h-4 w-4" />
-                              Manage trip
+                              <Eye className="h-4 w-4" />
+                              View
                             </Link>
                           </DropdownMenuItem>
-                        ) : null}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                          {showCompleteAction && isDriverBookingInProgress(booking) ? (
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={`/trips/${booking.id}`}
+                                className="flex items-center gap-2"
+                              >
+                                <CheckCircle2 className="h-4 w-4" />
+                                Manage trip
+                              </Link>
+                            </DropdownMenuItem>
+                          ) : null}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
                 );
               })
             )}

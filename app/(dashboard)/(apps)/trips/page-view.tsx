@@ -58,7 +58,8 @@ const TripsPageView = () => {
           <div>
             <CardTitle className="text-lg font-semibold text-default-900">Active Trips</CardTitle>
             <p className="mt-0.5 text-xs text-default-500">
-              Accepted trips that are not completed yet. Open a trip to update status.
+              In-progress trips (accepted, arrived, onboard, started). Open a trip to update
+              status.
             </p>
           </div>
           <p className="text-sm text-default-500">

@@ -169,17 +169,20 @@ const DriverBookingDetailPageView = () => {
               <p className="font-medium text-default-900">
                 {formatPrice(data.pricing.driverEarning, EUR_SYMBOL)}
               </p>
-              {data.pricing.commissionPercent != null ? (
-                <p className="text-xs text-default-500">
-                  after {data.pricing.commissionPercent}% commission
-                </p>
-              ) : null}
             </div>
-            {data.flight.required && data.flight.flightNumber ? (
+            {data.route.airportPickup ||
+            data.flight?.required ||
+            data.flight?.flightNumber ||
+            data.flight?.terminal ? (
               <div>
-                <p className="text-xs text-default-500">Flight</p>
-                <p className="font-medium text-default-900">{data.flight.flightNumber}</p>
-                {data.flight.terminal ? (
+                <p className="text-xs text-default-500">Flight details</p>
+                <p className="font-medium text-default-900">
+                  {data.route.airportPickup || data.flight?.required
+                    ? "Airport pickup"
+                    : "Flight"}
+                  {data.flight?.flightNumber ? ` · ${data.flight.flightNumber}` : ""}
+                </p>
+                {data.flight?.terminal ? (
                   <p className="text-sm text-default-600">Terminal {data.flight.terminal}</p>
                 ) : null}
               </div>

@@ -105,11 +105,6 @@ const AssignmentDetailPageView = () => {
                   currency: "EUR",
                 }).format(data.pricing.driverEarning)}
               </p>
-              {data.pricing.commissionPercent != null ? (
-                <p className="text-xs text-default-500">
-                  after {data.pricing.commissionPercent}% commission
-                </p>
-              ) : null}
             </div>
           </CardContent>
         </Card>

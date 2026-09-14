@@ -4,8 +4,8 @@ import LayoutLoader from "@/components/layout-loader";
 import DriverAcceptedBookingsPageView from "./page-view";
 
 export const metadata = getSeoMeta({
-  title: "My Bookings",
-  description: "View bookings you have accepted.",
+  title: "All Bookings",
+  description: "View all bookings you have accepted or completed.",
 });
 
 const DriverBookingsPage = () => {

@@ -1,4 +1,4 @@
-import { Application, Calendar, DashBoard, Graph, Messages, User, ClipBoard, Files, Building2, DocsCheck, List, Map, Flag, Cart, Users } from "@/components/svg";
+import { Application, Calendar, DashBoard, Graph, Messages, User, ClipBoard, Files, Building2, DocsCheck, List, Map, Flag, Cart } from "@/components/svg";
 import type { ComponentType } from "react";
 
 export interface MenuItem {
@@ -24,13 +24,9 @@ export const menus: MenuItem[] = [
     title: "Operations",
     icon: List,
     child: [
-      { title: "My Bookings", icon: DocsCheck, href: "/operations/bookings" },
-      { title: "Accepted Bookings", icon: ClipBoard, href: "/operations/accepted" },
-      { title: "Arrived Bookings", icon: Map, href: "/operations/arrived" },
-      { title: "Passenger Onboard", icon: Users, href: "/operations/onboard" },
-      { title: "Started Trips", icon: Graph, href: "/operations/started" },
-      { title: "Completed Bookings", icon: Flag, href: "/operations/completed" },
+      { title: "All Bookings", icon: DocsCheck, href: "/operations/bookings" },
       { title: "Active Trips", icon: Map, href: "/trips" },
+      { title: "Completed Bookings", icon: Flag, href: "/operations/completed" },
       { title: "Wallet", icon: Cart, href: "/wallet" },
     ],
   },

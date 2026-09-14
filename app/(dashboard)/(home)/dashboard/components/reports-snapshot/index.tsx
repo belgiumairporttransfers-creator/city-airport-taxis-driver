@@ -60,6 +60,7 @@ const ReportsSnapshot = () => {
       value: "earnings",
       series: series?.earnings ? [{ data: series.earnings }] : EMPTY_SERIES,
       color: primary,
+      valueFormat: "currency" as const,
     },
     {
       value: "today",
@@ -67,6 +68,7 @@ const ReportsSnapshot = () => {
         ? [{ data: series.thisMonthEarned }]
         : EMPTY_SERIES,
       color: info,
+      valueFormat: "currency" as const,
     },
     {
       value: "active",
@@ -74,6 +76,7 @@ const ReportsSnapshot = () => {
         ? [{ data: series.activeBookings }]
         : EMPTY_SERIES,
       color: warning,
+      valueFormat: "count" as const,
     },
     {
       value: "completed",
@@ -81,6 +84,7 @@ const ReportsSnapshot = () => {
         ? [{ data: series.completedBookings }]
         : EMPTY_SERIES,
       color: success,
+      valueFormat: "count" as const,
     },
   ];
 
@@ -133,7 +137,11 @@ const ReportsSnapshot = () => {
           </TabsList>
           {tabsContentData.map((item, index) => (
             <TabsContent key={`report-tab-${index}`} value={item.value}>
-              <ReportsChart series={item.series} chartColor={item.color} />
+              <ReportsChart
+                series={item.series}
+                chartColor={item.color}
+                valueFormat={item.valueFormat}
+              />
             </TabsContent>
           ))}
         </Tabs>

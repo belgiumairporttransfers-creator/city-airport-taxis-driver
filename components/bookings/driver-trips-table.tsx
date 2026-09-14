@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { TripSummary } from "@/lib/schemas/trip";
+import { getTripTypeLabel } from "@/lib/trip-type-label";
 import { tripStatusClasses, tripStatusLabels } from "@/lib/trips/trip-utils";
 
 const truncateAddress = (value: string, maxLength = 22) =>
@@ -35,6 +36,7 @@ const DriverTripsTable = ({ trips, loading = false }: DriverTripsTableProps) => 
         <TableHeader>
           <TableRow>
             <TableHead>Booking ID</TableHead>
+            <TableHead>Trip type</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead>Pickup</TableHead>
             <TableHead>Delivery</TableHead>
@@ -47,88 +49,120 @@ const DriverTripsTable = ({ trips, loading = false }: DriverTripsTableProps) => 
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={8} className="py-8 text-center text-default-500">
+              <TableCell colSpan={9} className="py-8 text-center text-default-500">
                 Loading trips...
               </TableCell>
             </TableRow>
           ) : trips.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="py-8 text-center text-default-500">
-                No active trips yet. Accept a booking from My Bookings to start a trip.
+              <TableCell colSpan={9} className="py-8 text-center text-default-500">
+                No active trips yet. Accept a booking to start a trip.
               </TableCell>
             </TableRow>
           ) : (
-            trips.map((trip) => (
-              <TableRow key={`${trip.id}-${trip.tripLeg ?? "outbound"}`}>
-                <TableCell className="font-semibold text-default-900">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span>{trip.bookingNumber}</span>
-                    {trip.tripLeg === "return" ? (
-                      <span className="inline-flex rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">
-                        Return
+            trips.map((trip) => {
+              const tripType = getTripTypeLabel(trip.category);
+              const legLabel =
+                trip.tripLeg === "return"
+                  ? "Return leg"
+                  : trip.tripLeg === "outbound"
+                    ? "Outbound"
+                    : null;
+
+              return (
+                <TableRow key={`${trip.id}-${trip.tripLeg ?? "outbound"}`}>
+                  <TableCell className="font-semibold text-default-900">
+                    <Link
+                      href={`/trips/${trip.id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {trip.bookingNumber}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
+                        {tripType}
                       </span>
-                    ) : null}
-                  </div>
-                </TableCell>
-                <TableCell className="font-semibold text-default-900">
-                  {trip.customer.firstName}
-                </TableCell>
-                <TableCell className="max-w-[180px] truncate text-default-600" title={trip.route.pickupAddress}>
-                  {truncateAddress(trip.route.pickupAddress)}
-                </TableCell>
-                <TableCell className="max-w-[180px] truncate text-default-600" title={trip.route.dropoffAddress}>
-                  {truncateAddress(trip.route.dropoffAddress)}
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-default-600">
-                  {trip.route.pickupDate} {trip.route.pickupTime}
-                </TableCell>
-                <TableCell>
-                  <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
-                    {trip.vehicle.categoryName}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      tripStatusClasses[trip.status] ?? "bg-default-100 text-default-600"
-                    }`}
+                      {legLabel ? (
+                        <span className="inline-flex rounded-full bg-info/10 px-2 py-0.5 text-xs font-medium text-info">
+                          {legLabel}
+                        </span>
+                      ) : null}
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-semibold text-default-900">
+                    {trip.customer.firstName}
+                  </TableCell>
+                  <TableCell
+                    className="max-w-[180px] truncate text-default-600"
+                    title={trip.route.pickupAddress}
                   >
-                    {tripStatusLabels[trip.status] ?? trip.status}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button type="button" size="icon" variant="ghost" aria-label="Open actions">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href={`/trips/${trip.id}`}
-                          className="flex items-center gap-2"
+                    {truncateAddress(trip.route.pickupAddress)}
+                  </TableCell>
+                  <TableCell
+                    className="max-w-[180px] truncate text-default-600"
+                    title={trip.route.dropoffAddress}
+                  >
+                    {truncateAddress(trip.route.dropoffAddress)}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-default-600">
+                    {trip.route.pickupDate} {trip.route.pickupTime}
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-700">
+                      {trip.vehicle.categoryName}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        tripStatusClasses[trip.status] ??
+                        "bg-default-100 text-default-600"
+                      }`}
+                    >
+                      {tripStatusLabels[trip.status] ?? trip.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          aria-label="Open actions"
                         >
-                          <Eye className="h-4 w-4" />
-                          View Trip
-                        </Link>
-                      </DropdownMenuItem>
-                      {trip.status !== "completed" ? (
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem asChild>
                           <Link
                             href={`/trips/${trip.id}`}
                             className="flex items-center gap-2"
                           >
-                            <CheckCircle2 className="h-4 w-4" />
-                            Mark Complete
+                            <Eye className="h-4 w-4" />
+                            View Trip
                           </Link>
                         </DropdownMenuItem>
-                      ) : null}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))
+                        {trip.status !== "completed" ? (
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={`/trips/${trip.id}`}
+                              className="flex items-center gap-2"
+                            >
+                              <CheckCircle2 className="h-4 w-4" />
+                              Manage trip
+                            </Link>
+                          </DropdownMenuItem>
+                        ) : null}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>

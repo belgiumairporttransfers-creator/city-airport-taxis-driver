@@ -33,6 +33,7 @@ import {
   useDriverWalletTransactions,
   useRequestDriverPayout,
 } from "@/hooks/queries/use-wallet";
+import { useDriverDashboard } from "@/hooks/queries/use-dashboard";
 import { formatDate, formatPrice, formatTime } from "@/lib/utils";
 
 const SummaryCard = ({
@@ -75,6 +76,8 @@ const DriverWalletPageView = () => {
   const [note, setNote] = React.useState("");
 
   const { data: summary, isLoading, isError } = useDriverWallet();
+  const { data: dashboard } = useDriverDashboard();
+  const recentCompleted = dashboard?.recentOrders ?? [];
   const {
     data: transactions,
     isLoading: transactionsLoading,
@@ -136,8 +139,7 @@ const DriverWalletPageView = () => {
           <div>
             <h1 className="text-2xl font-semibold text-default-900">Driver Wallet</h1>
             <p className="mt-1 text-sm text-default-500">
-              Track earnings, request payouts, and review your wallet history. A{" "}
-              {summary.commissionPercent}% platform fee is deducted from card trips.
+              Track earnings, request payouts, and review your wallet history.
             </p>
           </div>
           <Button
@@ -191,6 +193,67 @@ const DriverWalletPageView = () => {
             icon={Car}
           />
         </div>
+
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-border px-5 py-4">
+            <div>
+              <CardTitle className="text-lg font-semibold text-default-900">
+                Recent Completed Bookings
+              </CardTitle>
+              <p className="mt-0.5 text-xs text-default-500">
+                Latest trips you completed and earned from.
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/operations/completed">View all</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-default-50 text-left">
+                    <th className="px-4 py-3 font-medium text-default-600">Booking</th>
+                    <th className="px-4 py-3 font-medium text-default-600">Customer</th>
+                    <th className="px-4 py-3 font-medium text-default-600">Completed</th>
+                    <th className="px-4 py-3 text-right font-medium text-default-600">
+                      Your payout
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentCompleted.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-default-500">
+                        No completed bookings yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    recentCompleted.map((booking) => (
+                      <tr key={booking.id} className="border-b border-border last:border-0">
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/bookings/${booking.id}`}
+                            className="font-medium text-primary hover:underline"
+                          >
+                            {booking.bookingNumber}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3 text-default-700">{booking.customerName}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-default-600">
+                          {formatDate(booking.date)} {formatTime(booking.date)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-default-900">
+                          {formatPrice(booking.amount)}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="overflow-hidden">
           <CardHeader className="border-b border-border px-5 py-4">

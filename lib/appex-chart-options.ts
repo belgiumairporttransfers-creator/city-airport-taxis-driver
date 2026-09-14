@@ -1,14 +1,32 @@
-export const getYAxisConfig = (color: string): { labels: { style: { color: string; fontFamily: string; } } } => ({
+type YAxisLabelFormatter = (value: number) => string;
+
+export const getYAxisConfig = (
+  color: string,
+  formatter?: YAxisLabelFormatter
+): {
+  labels: {
+    style: { colors: string; fontFamily: string };
+    formatter: YAxisLabelFormatter;
+  };
+} => ({
   labels: {
     style: {
-      color: color,
+      colors: color,
       fontFamily: "Inter",
     },
+    formatter:
+      formatter ??
+      ((value: number) => {
+        if (!Number.isFinite(value)) return "0";
+        const rounded = Math.round(value * 100) / 100;
+        return Number.isInteger(rounded)
+          ? String(rounded)
+          : rounded.toFixed(2);
+      }),
   },
 });
 
-
-export const getXAxisConfig = (colors: string): { } => ({
+export const getXAxisConfig = (colors: string): {} => ({
   categories: [
     "Jan",
     "Feb",
@@ -32,15 +50,21 @@ export const getXAxisConfig = (colors: string): { } => ({
   },
 });
 
-export const getLabel = (colors:any): {  } => ({
+export const getLabel = (colors: any): {} => ({
   style: {
     colors: colors,
     fontFamily: "Inter",
   },
 });
 
-
-export const getGridConfig = (color: string): { show: boolean; borderColor: string; strokeDashArray: number; position: string; } => ({
+export const getGridConfig = (
+  color: string
+): {
+  show: boolean;
+  borderColor: string;
+  strokeDashArray: number;
+  position: string;
+} => ({
   show: true,
   borderColor: color,
   strokeDashArray: 10,
