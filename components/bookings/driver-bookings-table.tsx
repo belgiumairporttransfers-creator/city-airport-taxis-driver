@@ -19,28 +19,16 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import type { DriverBooking } from "@/lib/schemas/booking";
+import {
+  getDriverBookingDisplayStatus,
+  isDriverBookingInProgress,
+} from "@/lib/booking-status-display";
 import { formatDate, formatPrice, formatTime } from "@/lib/utils";
 
 const EUR_SYMBOL = "€";
 
 const truncateAddress = (value: string, maxLength = 22) =>
   value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
-
-const bookingStatusLabels: Record<string, string> = {
-  pending: "Pending",
-  confirmed: "Confirmed",
-  accepted: "Accepted",
-  complete: "Complete",
-  cancelled: "Cancelled",
-};
-
-const bookingStatusClasses: Record<string, string> = {
-  pending: "bg-default-50 text-default-700 border border-default-200",
-  confirmed: "bg-primary/10 text-primary border border-transparent",
-  accepted: "bg-info/10 text-info border border-transparent",
-  complete: "bg-success/10 text-success border border-transparent",
-  cancelled: "bg-default-100 text-default-600 border border-transparent",
-};
 
 type DriverBookingsTableProps = {
   bookings: DriverBooking[];
@@ -99,7 +87,10 @@ const DriverBookingsTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              bookings.map((booking) => (
+              bookings.map((booking) => {
+                const display = getDriverBookingDisplayStatus(booking);
+
+                return (
                 <TableRow key={booking.id}>
                   <TableCell className="font-semibold text-default-900">
                     {booking.bookingNumber}
@@ -130,11 +121,9 @@ const DriverBookingsTable = ({
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        bookingStatusClasses[booking.status] ?? "bg-default-100 text-default-600"
-                      }`}
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${display.className}`}
                     >
-                      {bookingStatusLabels[booking.status] ?? booking.status}
+                      {display.label}
                     </span>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-default-600">
@@ -154,14 +143,14 @@ const DriverBookingsTable = ({
                             View
                           </Link>
                         </DropdownMenuItem>
-                        {showCompleteAction && booking.status === "accepted" ? (
+                        {showCompleteAction && isDriverBookingInProgress(booking) ? (
                           <DropdownMenuItem asChild>
                             <Link
                               href={`/trips/${booking.id}`}
                               className="flex items-center gap-2"
                             >
                               <CheckCircle2 className="h-4 w-4" />
-                              Mark Complete
+                              Manage trip
                             </Link>
                           </DropdownMenuItem>
                         ) : null}
@@ -169,7 +158,8 @@ const DriverBookingsTable = ({
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>

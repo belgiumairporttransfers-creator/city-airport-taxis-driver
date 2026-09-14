@@ -8,6 +8,7 @@ import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAcceptDriverBooking, useDriverBooking } from "@/hooks/queries/use-driver-bookings";
+import { getDriverBookingDisplayStatus } from "@/lib/booking-status-display";
 import { formatPrice } from "@/lib/utils";
 
 const EUR_SYMBOL = "€";
@@ -52,6 +53,10 @@ const DriverBookingDetailPageView = () => {
     data.status === "confirmed" && data.assignmentId && !data.canAccept && !data.unavailableMessage
       ? data.assignmentId
       : undefined;
+  const displayStatus = getDriverBookingDisplayStatus({
+    status: data.status,
+    tripPhase: data.tripPhase ?? null,
+  });
 
   return (
     <>
@@ -84,7 +89,7 @@ const DriverBookingDetailPageView = () => {
           <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>{data.bookingNumber}</CardTitle>
-              <p className="mt-1 text-sm capitalize text-default-500">{data.status}</p>
+              <p className="mt-1 text-sm text-default-500">{displayStatus.label}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               {canAccept ? (

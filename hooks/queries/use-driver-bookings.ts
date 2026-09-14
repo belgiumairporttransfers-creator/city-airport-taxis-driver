@@ -19,8 +19,9 @@ export const useDriverBookings = (
   return useQuery({
     queryKey: [...DRIVER_BOOKINGS_QUERY_KEY, params],
     queryFn: () => getDriverBookings(params),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 15,
     refetchOnWindowFocus: true,
+    refetchInterval: 10_000,
     enabled: options?.enabled ?? true,
   });
 };

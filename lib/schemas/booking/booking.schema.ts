@@ -9,6 +9,14 @@ export const driverBookingStatusSchema = z.enum([
   "cancelled",
 ]);
 
+export const driverBookingTripPhaseSchema = z.enum([
+  "driver_accepted",
+  "driver_arrived",
+  "passenger_onboard",
+  "trip_started",
+  "completed",
+]);
+
 export const driverBookingSchema = z.object({
   id: z.string(),
   bookingNumber: z.string(),
@@ -33,6 +41,17 @@ export const driverBookingSchema = z.object({
     assignedAt: z.string().optional(),
     acceptedAt: z.string().optional(),
   }),
+  trip: z
+    .object({
+      startedAt: z.string().optional(),
+      completedAt: z.string().optional(),
+      driverArrivedAt: z.string().optional(),
+      passengerBoardedAt: z.string().optional(),
+      actualPickupTime: z.string().optional(),
+      actualDropoffTime: z.string().optional(),
+    })
+    .optional(),
+  tripPhase: driverBookingTripPhaseSchema.nullable().optional(),
   timeline: z.array(
     z.object({
       event: z.string(),
@@ -60,6 +79,7 @@ export const getDriverBookingsParamsSchema = z.object({
   limit: z.number().optional(),
   search: z.string().optional(),
   scope: z.enum(["accepted", "completed", "all"]).optional(),
+  tripPhase: driverBookingTripPhaseSchema.optional(),
   sort: z.string().optional(),
 });
 
@@ -77,6 +97,7 @@ export const driverOpenBookingSchema = z.object({
     terminal: z.string().optional(),
   }),
   notes: z.string().optional(),
+  tripPhase: driverBookingTripPhaseSchema.nullable().optional(),
   pricing: z.object({
     total: z.number().optional(),
     commissionPercent: z.number().optional(),
@@ -100,6 +121,7 @@ export const acceptOpenBookingResponseSchema = z.object({
 });
 
 export type DriverBooking = z.infer<typeof driverBookingSchema>;
+export type DriverBookingTripPhase = z.infer<typeof driverBookingTripPhaseSchema>;
 export type DriverBookingsResponse = z.infer<typeof driverBookingsResponseSchema>;
 export type GetDriverBookingsParams = z.infer<typeof getDriverBookingsParamsSchema>;
 export type DriverOpenBooking = z.infer<typeof driverOpenBookingSchema>;

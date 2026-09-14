@@ -21,6 +21,7 @@ const refreshTripQueries = async (
 ) => {
   await queryClient.invalidateQueries({ queryKey: TRIPS_QUERY_KEY });
   await queryClient.invalidateQueries({ queryKey: tripQueryKey(bookingId) });
+  await queryClient.invalidateQueries({ queryKey: ["driver-bookings"] });
 };
 
 export const useTrips = () => {
