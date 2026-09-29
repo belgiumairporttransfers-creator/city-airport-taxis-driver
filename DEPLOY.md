@@ -13,6 +13,7 @@ ssh root@82.29.177.100 "cd /opt/city-airport-taxis-driver && docker build \
   --build-arg NEXT_PUBLIC_BACKEND_URL='https://api.city-airport-taxis.be/api' \
   --build-arg NEXT_PUBLIC_SITE_URL='https://driver.city-airport-taxis.be' \
   --build-arg NEXT_PUBLIC_SOCKET_PATH='/socket.io' \
+  --build-arg NEXT_PUBLIC_WEBSITE_URL='https://www.city-airport-taxis.be/en' \
   -t city-airport-taxis-driver:local ."
 
 # 3. Restart container
